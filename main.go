@@ -87,6 +87,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	if len(fileMap) == 0 {
+		log.Println("Found no new posts. Exit.")
+		os.Exit(0)
+	}
+
 	err = writeToBlog(fileMap)
 	if err != nil {
 		log.Fatal(err)
