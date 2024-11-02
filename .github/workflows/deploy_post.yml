@@ -35,4 +35,9 @@ jobs:
         run: |-
           cd my-blog
           ls -l _posts
-          git help
+          if (git status | grep 'clean'); then \
+              echo "Nothing to commit";
+          else
+            git add -v _posts/
+            git diff || (git commit -m "Deploy posts") || (git push)
+          fi
