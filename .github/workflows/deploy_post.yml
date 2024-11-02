@@ -31,6 +31,7 @@ jobs:
         with:
           repository: nhv96/nhv96.github.io
           path: my-blog
+          token: ${{ secrets.ACTION_GITHUB_TOKEN }}
       - name: Find new posts and write to my-blog
         run: |-
           cd main
