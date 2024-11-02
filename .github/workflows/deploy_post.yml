@@ -1,0 +1,38 @@
+name: Deploy New Posts to Blog
+on:
+  push:
+    branches:
+      - main
+
+env:
+  BLOG_DIR: ${{ vars.BLOG_DIR }}
+  POST_CATEGORY: ${{ vars.POST_CATEGORY }}
+  POST_LAYOUT: ${{ vars.POST_LAYOUT }}
+
+jobs:
+  deploy-posts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout til repository
+        uses: actions/checkout@v4
+        with:
+          path: main
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.19.0'
+      - run: go version
+      - name: Checkout blog repository
+        uses: actions/checkout@v4
+        with:
+          repository: nhv96/nhv96.github.io
+          path: my-blog
+      - name: Find new posts and write to my-blog
+        run: |-
+          cd main
+          go run main.go
+      - name: Deploy new posts in my-blog
+        run: |-
+          cd my-blog
+          ll _posts
+          git help
