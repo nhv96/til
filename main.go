@@ -47,6 +47,12 @@ func init() {
 	postLayout = os.Getenv("POST_LAYOUT")
 
 	ignoreFiles = append(ignoreFiles, blogRepositoryDir)
+
+	log.Println(fmt.Sprintf(`
+	Blog dir: %s
+	Post category: %s
+	Post layout: %s
+	`, blogRepositoryDir, postCategory, postLayout))
 }
 
 type Post struct {
