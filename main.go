@@ -37,10 +37,7 @@ category: {{ .Category }}
 )
 
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal(err)
-	}
+	godotenv.Load()
 
 	blogRepositoryDir = os.Getenv("BLOG_DIR")
 	postCategory = os.Getenv("POST_CATEGORY")
