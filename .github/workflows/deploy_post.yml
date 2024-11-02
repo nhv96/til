@@ -34,5 +34,5 @@ jobs:
       - name: Deploy new posts in my-blog
         run: |-
           cd my-blog
-          ll _posts
+          ls -l _posts
           git help
