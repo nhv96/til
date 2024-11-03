@@ -117,7 +117,7 @@ func fileInfoToBlogPost(path string, fi fs.FileInfo) (*Post, error) {
 
 	name := strings.ReplaceAll(segs[0], "-", " ")
 
-	name = strings.ToTitle(name)
+	name = strings.Title(name)
 
 	p := &Post{
 		Title:    name,
