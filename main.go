@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/joho/godotenv"
 	"golang.org/x/exp/slices"
@@ -64,7 +65,10 @@ type Post struct {
 func main() {
 	r := regexp.MustCompile(docRegex)
 
-	fileMap := make(map[string]*Post)
+	posts := make(map[string]*Post)
+
+	// find new/updated documents based on time
+	now := time.Now().Format(timeLayout)
 
 	err := filepath.Walk(".", func(path string, info fs.FileInfo, err error) error {
 		if strings.HasPrefix(path, ".git") || strings.HasPrefix(path, blogRepositoryDir) {
@@ -75,13 +79,13 @@ func main() {
 			return nil
 		}
 
-		if err == nil && r.MatchString(info.Name()) {
+		if err == nil && r.MatchString(info.Name()) && now == info.ModTime().Format(timeLayout) {
 			post, err := fileInfoToBlogPost(path, info)
 			if err != nil {
 				return err
 			}
 
-			fileMap[post.FileName] = post
+			posts[post.FileName] = post
 		}
 		return nil
 	})
@@ -90,12 +94,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if len(fileMap) == 0 {
+	if len(posts) == 0 {
 		log.Println("Found no new posts. Exit.")
 		os.Exit(0)
 	}
 
-	err = writeToBlog(fileMap)
+	err = writeToBlog(posts)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -111,7 +115,7 @@ func fileInfoToBlogPost(path string, fi fs.FileInfo) (*Post, error) {
 
 	modTime := fi.ModTime().Format(timeLayout)
 
-	blogFileName := fmt.Sprintf(blogPostFormat, modTime, fi.Name())
+	blogFileName := fi.Name()
 
 	segs := strings.Split(fi.Name(), ".")
 
@@ -121,7 +125,7 @@ func fileInfoToBlogPost(path string, fi fs.FileInfo) (*Post, error) {
 
 	p := &Post{
 		Title:    name,
-		Date:     fi.ModTime().Format(timeLayout),
+		Date:     modTime,
 		Category: postCategory,
 		Layout:   postLayout,
 		FileName: blogFileName,
@@ -131,12 +135,30 @@ func fileInfoToBlogPost(path string, fi fs.FileInfo) (*Post, error) {
 	return p, nil
 }
 
-func writeToBlog(posts map[string]*Post) error {
+func writeToBlog(postsToWrite map[string]*Post) error {
 	t := template.Must(template.New("blogpost").Parse(postTemplate))
 
-	for postPath, post := range posts {
-		// the repository dir should already existed
-		file, err := os.Create(fmt.Sprintf("%s/%s", blogRepositoryDir, postPath))
+	currentPosts, err := findAllCurrentPosts(blogRepositoryDir)
+	if err != nil {
+		return nil
+	}
+
+	// the blog repository should already existed
+	for postName, post := range postsToWrite {
+		var (
+			file *os.File
+			err  error
+		)
+		// a post already existed
+		if fileNameInBlog, exist := currentPosts[postName]; exist {
+			file, err = os.OpenFile(fmt.Sprintf("%s/%s", blogRepositoryDir, fileNameInBlog), os.O_RDWR, os.ModeAppend)
+		} else {
+			filename := post.Date + "-" + postName
+			file, err = os.Create(fmt.Sprintf("%s/%s", blogRepositoryDir, filename))
+		}
+
+		defer file.Close()
+
 		if err != nil {
 			return err
 		}
@@ -147,4 +169,31 @@ func writeToBlog(posts map[string]*Post) error {
 		}
 	}
 	return nil
+}
+
+func findAllCurrentPosts(dir string) (map[string]string, error) {
+	currentPosts := map[string]string{}
+
+	r := regexp.MustCompile(docRegex)
+
+	err := filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+
+		if err == nil && r.MatchString(info.Name()) {
+			// trim the date prefix YYYY-MM-DD-
+			name := info.Name()[11:]
+
+			currentPosts[name] = info.Name()
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return currentPosts, nil
 }
