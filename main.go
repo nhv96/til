@@ -151,6 +151,9 @@ func writeToBlog(postsToWrite map[string]*Post) error {
 		)
 		// a post already existed
 		if fileNameInBlog, exist := currentPosts[postName]; exist {
+			// re assign the initial date of the post
+			post.Date = fileNameInBlog[:10]
+
 			file, err = os.OpenFile(fmt.Sprintf("%s/%s", blogRepositoryDir, fileNameInBlog), os.O_RDWR, os.ModeAppend)
 		} else {
 			filename := post.Date + "-" + postName
