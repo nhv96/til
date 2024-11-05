@@ -13,6 +13,8 @@ import (
 
 	"github.com/joho/godotenv"
 	"golang.org/x/exp/slices"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 var (
@@ -121,7 +123,8 @@ func fileInfoToBlogPost(path string, fi fs.FileInfo) (*Post, error) {
 
 	name := strings.ReplaceAll(segs[0], "-", " ")
 
-	name = strings.Title(name)
+	cs := cases.Title(language.English)
+	name = cs.String(name)
 
 	p := &Post{
 		Title:    name,
