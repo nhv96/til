@@ -6,3 +6,5 @@ Journal is a sequential, binary transaction log used to bring the db into a vali
 Journaling writes data first to the journal and then to the core data files. MongoDB enables journaling by default for 64-bit builds of MongoDB version 2.0 and newer. Journal files are pre-allocated and exist as files in the data directory.
 
 The operation that "flush" the data from journal files to the data files is done lazily. (about 60 sec)
+
+Journaling is enabled by default.

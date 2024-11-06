@@ -1,4 +1,4 @@
-# How it write
+# How it write to disk
 1. write to a log (disk)
 2. memtable (memory)
 3. ack the write

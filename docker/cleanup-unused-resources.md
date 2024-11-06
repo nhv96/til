@@ -20,7 +20,7 @@ $ sudo du -h /var | sort -h
 42G	/var
 ```
 
-Turn out docker overlay2 is taking so much space, so I use this command to clean up unused resources.
+Turn out docker `overlay2` is taking so much space, so I use this command to clean up unused resources.
 ```
 docker system prune
 ...
