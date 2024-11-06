@@ -36,7 +36,7 @@ jobs:
         run: |-
           cd my-blog
           ls -l _posts
-          if (git status | grep 'clean'); then \
+          if (git status | grep 'working tree clean'); then \
               echo "Nothing to commit";
           else
               git config --global user.email "vinhnguyenhoang96@gmail.com"
