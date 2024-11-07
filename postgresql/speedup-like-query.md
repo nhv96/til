@@ -32,3 +32,6 @@ CREATE INDEX `idx_trgm` ON table_name USING GiST(column name GiST_trgm_ops);
 Now, when running query against the column `name`, the query planner will chose the `idx_trgm` index to work on, this index now use the operator class `GiST_trgm_ops` to do the search, hence speed up the query.
 
 Trigram indexes also can help speed up regular expression queries.
+
+# References
+- [Mastering PostgreSQL 13](https://www.amazon.com/Mastering-PostgreSQL-administer-applications-efficiently/dp/1800567499)

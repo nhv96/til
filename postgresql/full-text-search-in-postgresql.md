@@ -41,3 +41,6 @@ CREATE TRIGGER tsvectorupdate
     EXECUTE PROCEDURE
         tsvector_update_trigger(some_name, 'pg_catalog.english', 'column name');
 ```
+
+# References
+- [Mastering PostgreSQL 13](https://www.amazon.com/Mastering-PostgreSQL-administer-applications-efficiently/dp/1800567499)
